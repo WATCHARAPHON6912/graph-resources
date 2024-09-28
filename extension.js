@@ -154,6 +154,7 @@ class GPUUsageViewProvider {
         return [
             [this.currentData.memoryUsage,this.currentData.memoryTotal],
             [this.currentData.GpuUsage,100]
+            // [this.currentData.device,0]
             // [this.currentData.ramUsed ,this.currentData.ramTotal],
             // [this.currentData.cpuUsage,100]
         ];
