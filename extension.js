@@ -109,46 +109,46 @@ class GPUUsageViewProvider {
                 }
             }
 
-            exec(cpuCommand, (error, stdout, stderr) => {
-                if(platform === 'win32'){
-                    if (error) {
-                        console.error(`Error executing CPU command: ${stderr}`);
-                        this.currentData.cpuUsage = 'Error';
-                    } else {
-                        this.currentData.cpuUsage = `${stdout.trim().split('=')[1]}`;
-                    }
-                }
-                else{
-                    this.currentData.cpuUsage = stdout.trim();
-                }
+            // exec(cpuCommand, (error, stdout, stderr) => {
+            //     if(platform === 'win32'){
+            //         if (error) {
+            //             console.error(`Error executing CPU command: ${stderr}`);
+            //             this.currentData.cpuUsage = 'Error';
+            //         } else {
+            //             this.currentData.cpuUsage = `${stdout.trim().split('=')[1]}`;
+            //         }
+            //     }
+            //     else{
+            //         this.currentData.cpuUsage = stdout.trim();
+            //     }
 
-            exec(ramCommand, (error, stdout, stderr) => {
-                if(platform === 'win32'){
-                    if (error) {
-                        console.error(`Error executing RAM command: ${stderr}`);
-                        this.currentData.ramUsage = 'Error';
-                    } else {
-                        var x=stdout.trim().split('\n');
-                        var free=x[0].split('=')[1];
-                        var total=x[1].split('=')[1]
-                        this.currentData.ramUsed = `${((total-free)/ (1024 * 1024)).toFixed(2)}`;
-                        this.currentData.ramTotal = `${(total/ (1024 * 1024)).toFixed(2)}`;
-                    }
-                }else{
-                    if (error) {
-                        console.error(`Error executing RAM command: ${stderr}`);
-                        this.currentData.ramUsage = 'Error';
-                    } else {
-                        var x=stdout.trim().split('\n');
-                        var total=x[0];
-                        var used=x[1];
-                        this.currentData.ramUsed = `${(used/ (1024)).toFixed(2)}`;
-                        this.currentData.ramTotal= `${(total/ (1024)).toFixed(2)}`;
-                    }
-                }
-                this._onDidChangeTreeData.fire(); // อัปเดต tree view
-                });
-            });
+            // exec(ramCommand, (error, stdout, stderr) => {
+            //     if(platform === 'win32'){
+            //         if (error) {
+            //             console.error(`Error executing RAM command: ${stderr}`);
+            //             this.currentData.ramUsage = 'Error';
+            //         } else {
+            //             var x=stdout.trim().split('\n');
+            //             var free=x[0].split('=')[1];
+            //             var total=x[1].split('=')[1]
+            //             this.currentData.ramUsed = `${((total-free)/ (1024 * 1024)).toFixed(2)}`;
+            //             this.currentData.ramTotal = `${(total/ (1024 * 1024)).toFixed(2)}`;
+            //         }
+            //     }else{
+            //         if (error) {
+            //             console.error(`Error executing RAM command: ${stderr}`);
+            //             this.currentData.ramUsage = 'Error';
+            //         } else {
+            //             var x=stdout.trim().split('\n');
+            //             var total=x[0];
+            //             var used=x[1];
+            //             this.currentData.ramUsed = `${(used/ (1024)).toFixed(2)}`;
+            //             this.currentData.ramTotal= `${(total/ (1024)).toFixed(2)}`;
+            //         }
+            //     }
+            //     this._onDidChangeTreeData.fire(); // อัปเดต tree view
+            //     });
+            // });
         });
 
         return [
