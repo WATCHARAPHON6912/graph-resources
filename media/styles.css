@@ -1,0 +1,261 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c2c2c;
+    color: #000000;
+    min-width: 2px;
+}
+
+.container-menu {
+    width: 100%;
+    /* height: 5px; */
+}
+
+button {
+    background: #4144f7;
+    color: white;
+    /* border: none; */
+    border-radius: 6px;
+    cursor: pointer;
+    /* font-weight: 500; */
+    /* padding: 5px 20px; */
+    width: auto;
+}
+
+button:hover {
+    background: #4338ca;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.chart-container {
+    width: 100%;
+    height: auto; /* หรือปรับเป็นค่าคงที่ตามต้องการ */
+    background: rgb(44, 44, 44);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.popup {
+    background: rgb(240, 240, 240);
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: 80%;
+    max-width: 500px;
+    padding: 1rem;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999;
+}
+
+.menu-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+.menu-grid {
+    display: grid;
+    margin-bottom: 1.5rem;
+}
+
+.menu-section {
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.menu-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+.menu-item label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.storage-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.storage-title {
+    font-weight: 600;
+    color: #424242;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.storage-bar {
+    background: #666666;
+    height: 24px;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.storage-fill {
+    background: #38e608;
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.3s ease;
+}
+
+.storage-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.exit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.exit-button:hover {
+    background: #dc2626;
+}
+
+.gpu-n-input {
+    width: 60px;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+}
+
+/* Popup List */
+.popup-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.popup-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.popup-list-item:last-child {
+    border-bottom: none;
+}
+
+.popup-list-item label {
+    flex-grow: 1;
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.popup-list-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+.popup-list-item button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.popup-list-item button:hover {
+    background: #4338ca;
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2rem;
+    background: transparent;
+    border: none;
+    color: #000;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.popup-close:hover {
+    color: #ef4444; /* Change color on hover */
+}
+
+.popup-content {
+    margin-top: 2rem;
+    /* Add your other content styles here */
+}
+
+@media screen and (max-width: 768px) {
+    .popup {
+        min-width: 50%;
+        max-width: 100%;
+        min-height: 50%;
+        padding: 1.5rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        grid-template-columns: 1fr;
+    }
+}

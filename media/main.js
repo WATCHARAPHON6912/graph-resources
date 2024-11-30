@@ -107,7 +107,8 @@
         const message = event.data;
         switch (message.command) {
             case 'update':
-                updateChart(message.data);
+                // updateChart(message.data);
+                console.log("jj")
                 break;
         }
     });
@@ -116,9 +117,9 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         updateChart(data);
+      
     }
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 })();
-
