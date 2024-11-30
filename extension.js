@@ -170,9 +170,9 @@ class GPUUsageViewProvider {
         const platform = process.platform;
         let nvidiaCommand, cpuCommand, ramCommand, driveCommand, netCommand;
         if (platform === 'win32') {
-            nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
-        nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
-            // nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
+        //     nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
+        // nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
+            nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
             cpuCommand = 'wmic cpu get loadpercentage /value';
             ramCommand = 'wmic OS get FreePhysicalMemory,TotalVisibleMemorySize /value';
             driveCommand = "wmic logicaldisk get Caption, Size, FreeSpace /format:csv";
