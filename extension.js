@@ -170,8 +170,8 @@ class GPUUsageViewProvider {
         const platform = process.platform;
         let nvidiaCommand, cpuCommand, ramCommand, driveCommand, netCommand;
         if (platform === 'win32') {
-        //     nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
-        // nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
+            //     nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
+            // nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
             nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
             cpuCommand = 'wmic cpu get loadpercentage /value';
             ramCommand = 'wmic OS get FreePhysicalMemory,TotalVisibleMemorySize /value';
@@ -181,7 +181,8 @@ class GPUUsageViewProvider {
             nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
             cpuCommand = "top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'";
             ramCommand = "free -m | awk '/Mem:/ {printf \"%d\\n%d\", $3, $2}'";
-            driveCommand = "";
+            driveCommand = "df -B1 | awk 'NR==1 {print \"Filesystem,Size,Used,Available,Use%,Mounted_on\"} NR>1 {print $1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6}'";
+
             netCommand = "netstat -e"
         } else {
             console.error('Unsupported OS');
@@ -210,31 +211,7 @@ class GPUUsageViewProvider {
             }
 
         });
-        exec(driveCommand, (error, stdout, stderr) => {
 
-            if (error) {
-                console.error(`Error executing driveCommand: ${stderr}`);
-            } else {
-                const lines = stdout.trim().split('\n');
-                if (lines.length > 0) {
-                    this.currentData.drive = []
-                    for (let i = 1; i < lines.length; i++) {
-                        const [Node, Caption, FreeSpace, Size] = lines[i].replace("\r", "").split(',')
-                        this.currentData.drive.push({
-                            drive_name: Caption,
-                            total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
-                            use_Size: `${((Size - FreeSpace) / (1024 * 1024 * 1024)).toFixed(2)}`
-
-                        })
-                    }
-                }
-                
-                
-            }
-    
-
-        });
-        
 
         exec(cpuCommand, (error, stdout, stderr) => {
             if (platform === 'win32') {
@@ -265,18 +242,75 @@ class GPUUsageViewProvider {
                         this.currentData.ramUsage = 'Error';
                     } else {
                         var x = stdout.trim().split('\n');
-                        var total = x[0];
-                        var used = x[1];
+                        var total = x[1];
+                        var used = x[0];
                         this.currentData.cpu.memoryUsage = `${(used / (1024)).toFixed(2)}`;
                         this.currentData.cpu.memoryTotal = `${(total / (1024)).toFixed(2)}`;
                     }
                 }
             });
         });
+
+
+        exec(driveCommand, (error, stdout, stderr) => {
+
+            if (error) {
+                console.error(`Error executing driveCommand: ${stderr}`);
+
+            } else {
+                if (platform === 'win32') {
+                    const lines = stdout.trim().split('\n');
+                    if (lines.length > 0) {
+                        this.currentData.drive = []
+                        for (let i = 1; i < lines.length; i++) {
+                            const [Node, Caption, FreeSpace, Size] = lines[i].replace("\r", "").split(',')
+                            this.currentData.drive.push({
+                                drive_name: Caption,
+                                total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
+                                use_Size: `${((Size - FreeSpace) / (1024 * 1024 * 1024)).toFixed(2)}`
+
+                            })
+                        }
+                    }
+                }
+                else {
+                    const lines = stdout.trim().split('\n');
+                    if (lines.length > 0) {
+                        this.currentData.drive = []
+                        for (let i = 1; i < lines.length; i++) {
+                            const [Filesystem,Size,Used,Available,Use_percen,Mounted_on] = lines[i].replace("\r", "").split(',')
+                            this.currentData.drive.push({
+                                drive_name: Mounted_on,
+                                total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
+                                use_Size: `${((Used) / (1024 * 1024 * 1024)).toFixed(2)}`
+
+                            })
+                        }
+                    }
+                }
+
+
+            }
+
+
+        });
+
+        // console.log(this.currentData)
+
+
+
         // this.currentData.gpu[0].device="test gpu"
         // this.currentData.gpu[0].memoryTotal="10"
         // this.currentData.gpu[0].memoryUsage="5"
         // this.currentData.gpu[0].gpuUsage="55"
+        // this.currentData.drive = []
+        // this.currentData.drive.push({
+        //     drive_name: "ntest1",
+        //     total_Size: `${100}`,
+        //     use_Size: `${50}`
+
+        // })
+
         return this.currentData;
     }
 
