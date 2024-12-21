@@ -181,7 +181,6 @@ function closePopup() {
             chartContainers[i].style.height = chart_hight + "px";
         }
 
-
         // container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))'
         // container.style.gridTemplateRows = 'auto'
         container.style.gridTemplateColumns = '1fr'; // หนึ่งแถวแบบแนวตั้ง
@@ -205,10 +204,25 @@ function closePopup() {
             driveElement.id = `drive-${drive.drive_name}`;
             driveElement.style.marginBottom = "1.5rem";
 
+            // Create drive label container
             const driveLabel = document.createElement("div");
+            driveLabel.style.display = "flex";
+            driveLabel.style.justifyContent = "space-between";
             driveLabel.style.marginBottom = "0.5rem";
-            driveLabel.textContent = `Drive ${drive.drive_name}  Avail: ${(drive.total_Size - drive.use_Size).toFixed(2)}GB`;
 
+            // Left part (Drive Name)
+            const driveName = document.createElement("span");
+            driveName.textContent = `Drive: ${drive.drive_name}`;
+
+            // Right part (Available Space)
+            const driveAvail = document.createElement("span");
+            driveAvail.textContent = `Avail: ${(drive.total_Size - drive.use_Size).toFixed(2)}GB`;
+
+            // Append left and right parts to the driveLabel
+            driveLabel.appendChild(driveName);
+            driveLabel.appendChild(driveAvail);
+
+            // Create storage bar
             const storageBar = document.createElement("div");
             storageBar.classList.add("storage-bar");
 
@@ -433,18 +447,18 @@ function closePopup() {
                 dataset.label = `RAM ${new_data.cpu.memoryUsage}/${new_data.cpu.memoryTotal}GB`
             }
             else if (dataset.label[0] === "G" && num_gpu === "") {
-                let total=0
-                for(var x=0;x<new_data.gpu.length;x++){
-                    total+=parseFloat(new_data.gpu[x].gpuUsage)
+                let total = 0
+                for (var x = 0; x < new_data.gpu.length; x++) {
+                    total += parseFloat(new_data.gpu[x].gpuUsage)
                 }
 
                 dataset.label = `GPU: ${new_data.gpu.length}GPU`
-                data.push((total/new_data.gpu.length).toFixed(2));
+                data.push((total / new_data.gpu.length).toFixed(2));
             }
             else if (dataset.label[0] === "V" && num_gpu === "") {
-                let total=0
-                let used=0
-                for(var x=0;x<new_data.gpu.length;x++){
+                let total = 0
+                let used = 0
+                for (var x = 0; x < new_data.gpu.length; x++) {
                     total += parseFloat(new_data.gpu[x].memoryTotal)
                     used += parseFloat(new_data.gpu[x].memoryUsage)
                 }
