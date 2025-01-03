@@ -1,5 +1,5 @@
 # Graph
-- NVIDIA GPU support
+- Support for multiple NVIDIA GPUs
 - CPU supports both windows and ubuntu.
 ![NVIDIA Monitor](images/1.png)
 ![NVIDIA Monitor](images/2.png)
