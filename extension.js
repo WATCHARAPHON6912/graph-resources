@@ -180,7 +180,7 @@ class GPUUsageViewProvider {
         } else if (platform === 'linux') {
             nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
             cpuCommand = "top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'";
-            ramCommand = "free -m | awk '/Mem:/ {printf \"%d\\n%d\", $3, $2}'";
+            ramCommand = "LC_ALL=C free -m | awk '/Mem:/ {printf \"%d\\n%d\", $3, $2}'";
             driveCommand = "df -B1 | awk 'NR==1 {print \"Filesystem,Size,Used,Available,Use%,Mounted_on\"} NR>1 {print $1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6}'";
 
             netCommand = "netstat -e"
