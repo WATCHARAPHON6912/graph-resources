@@ -170,7 +170,7 @@ class GPUUsageViewProvider {
         const platform = process.platform;
         let nvidiaCommand, cpuCommand, ramCommand, driveCommand, netCommand;
         if (platform === 'win32') {
-            //     nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
+            // nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
             // nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
             nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
             cpuCommand = 'wmic cpu get loadpercentage /value';
@@ -278,7 +278,7 @@ class GPUUsageViewProvider {
                     if (lines.length > 0) {
                         this.currentData.drive = []
                         for (let i = 1; i < lines.length; i++) {
-                            const [Filesystem,Size,Used,Available,Use_percen,Mounted_on] = lines[i].replace("\r", "").split(',')
+                            const [Filesystem, Size, Used, Available, Use_percen, Mounted_on] = lines[i].replace("\r", "").split(',')
                             this.currentData.drive.push({
                                 drive_name: Mounted_on,
                                 total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
@@ -319,4 +319,3 @@ class GPUUsageViewProvider {
 module.exports = {
     activate
 };
-

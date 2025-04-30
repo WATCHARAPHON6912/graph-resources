@@ -17,45 +17,36 @@ function closePopup() {
     let settings;
     let label_index = 0;
 
-    // ฟังก์ชันเปิด popup
-
-
-    // ฟังก์ชันสำหรับสร้างข้อมูลจำลอง
     function generateRandomData(min = 0, max = 100) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+
     function createDualLineChart(canvasId, labels, colors = ['#4f46e5', '#ef4444']) {
-        const timeValue = document.getElementById('time').value; // ได้ค่า "30"
-        const timeInt = parseInt(timeValue, 10); // ได้ค่า 30 เป็น integer
+        const timeValue = document.getElementById('time')?.value || "30";
+        const timeInt = parseInt(timeValue, 10) || 30;
         const ctx = document.getElementById(canvasId).getContext('2d');
         const initialData = Array(timeInt + 1).fill(0);
-        const text_color = "#ffffff"
-        const y_color = "#6e6e6e"
-        const x_font_size = 10
-        const y_font_size = 11
-        const labels_font_size = 11
 
-        const map_show = {
-            "CPU Usage": settings.showCpu,
-            "RAM Usage": settings.showSystemVram,
-            "GPU Usage": settings.showGpus,
-            "VRAM Usage": settings.showGpuVram,
-            "Total Gpus Usage": settings.showTotalGpu,
-        }
-        const chart = []
-        for (i = 0; i < labels.length; i++) {
+        const text_color = "#ffffff";
+        const y_color = "#6e6e6e";
+        const x_font_size = 10;
+        const y_font_size = 11;
+        const labels_font_size = 11;
+
+        const chart = [];
+        for (let i = 0; i < labels.length; i++) {
             chart.push({
                 label: labels[i],
                 data: [...initialData],
-                borderColor: colors[i],
-                backgroundColor: colors[i] + '20',
+                borderColor: colors[i % colors.length],
+                backgroundColor: colors[i % colors.length] + '20',
                 tension: 0.2,
                 fill: true,
                 pointRadius: 0,
                 borderWidth: 1.5,
-                hidden: !map_show[labels[i]]
-            })
+                hidden: false  // <-- แสดงเส้นทั้งหมด
+            });
         }
 
         return new Chart(ctx, {
@@ -72,7 +63,6 @@ function closePopup() {
                         max: 100,
                         grid: {
                             color: y_color,
-
                         },
                         ticks: {
                             color: text_color,
@@ -95,9 +85,7 @@ function closePopup() {
                 },
                 plugins: {
                     legend: {
-                        // position: 'top-left',  // เปลี่ยนจาก 'top' เป็น 'top-left'
-                        align: 'start',        // จัดให้ชิดซ้าย
-                        // position: 'top',
+                        align: 'start',
                         labels: {
                             color: text_color,
                             font: {
@@ -110,7 +98,6 @@ function closePopup() {
                         intersect: false,
                     }
                 },
-
             }
         });
     }
@@ -153,47 +140,46 @@ function closePopup() {
                 }
             });
         }
+
+        return savedSettings
     }
 
-    // ฟังก์ชันอัพเดตการแสดงผล
     function updateDisplay() {
         const container = document.querySelector('.container');
-        const showCpuRamGraph = document.getElementById('showCpuRamGraph').checked;
-        const showGpuVramGraph = document.getElementById('showGpuVramGraph').checked;
-        const showTotalGpu = document.getElementById('showTotalGpu').checked;
-        const chart_hight = document.getElementById('chartHight').value;
+        const showCpuRamGraph = document.getElementById('showCpuRamGraph')?.checked ?? true;
+        const showGpuVramGraph = document.getElementById('showGpuVramGraph')?.checked ?? true;
+        const showTotalGpu = document.getElementById('showTotalGpu')?.checked ?? true;
+        const chartHeight = document.getElementById('chartHight')?.value || "200";
 
-        // อัพเดตการแสดงผลกราฟ
         const chartContainers = document.querySelectorAll('.chart-container');
-        chartContainers[0].style.display = showCpuRamGraph ? 'block' : 'none';
 
-        chartContainers[1].style.display = showTotalGpu ? 'block' : 'none';
-        // chartContainers[2].style.display = total_gpu ? 'block' : 'none';
+        // แสดง/ซ่อนกราฟหลักตาม checkbox
+        if (chartContainers[0]) chartContainers[0].style.display = showCpuRamGraph ? 'block' : 'none';
+        if (chartContainers[1]) chartContainers[1].style.display = showTotalGpu ? 'block' : 'none';
 
+        // กราฟ GPU / VRAM
         for (let i = 2; i < chartContainers.length; i++) {
             chartContainers[i].style.display = showGpuVramGraph ? 'block' : 'none';
         }
-        // for (let i = 0; i < chartContainers.length; i++) {
-        //     chartContainers[i].style.height = chart_hight + "px"
-        // }
-        for (let i = 0; i < chartContainers.length; i++) {
-            chartContainers[i].style.width = '100%';
-            chartContainers[i].style.height = chart_hight + "px";
-        }
 
-        // container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))'
-        // container.style.gridTemplateRows = 'auto'
-        container.style.gridTemplateColumns = '1fr'; // หนึ่งแถวแบบแนวตั้ง
+        // กำหนดความกว้างและความสูงกราฟทั้งหมด
+        chartContainers.forEach(container => {
+            container.style.width = '100%';
+            container.style.height = `${chartHeight}px`;
+        });
+
+        // ปรับ layout เป็นแนวตั้ง
+        container.style.gridTemplateColumns = '1fr';
         container.style.gridTemplateRows = 'auto';
 
         saveSettings();
     }
 
+
     function createAndRenderDrives(drives) {
         const container = document.getElementById("drives-container");
         container.innerHTML = ""; // Clear previous content
 
-        // Add title
         const title = document.createElement("div");
         title.classList.add("storage-title");
         title.textContent = "Storage Usage";
@@ -244,7 +230,6 @@ function closePopup() {
         });
     }
 
-    // Event Listeners และการเริ่มต้นระบบ
     window.addEventListener('load', function () {
         // โหลดการตั้งค่า
         loadSettings();
@@ -353,10 +338,13 @@ function closePopup() {
         }
     }
 
+
     window.addEventListener('message', event => {
         const message = event.data;
         switch (message.command) {
             case 'update':
+
+                createAndRenderDrives(message.data.drive);
                 if (charts.cpuRam && document.getElementById('showCpuRamGraph').checked) {
                     updateDualChartData(charts.cpuRam, message.data);
                 }
@@ -401,6 +389,7 @@ function closePopup() {
                 break;
         }
     });
+
 
     // ฟังก์ชันอัพเดตข้อมูลกราฟที่มี 2 เส้น
     let te = 0;
@@ -500,5 +489,7 @@ function closePopup() {
         createAndRenderDrives(new_data.drive);
         chart.update('none');
     }
+
+
 
 })();

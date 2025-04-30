@@ -54,7 +54,7 @@
 
     }
 
-    function line(text = "cpu",unit="%",value_max=100 , index = 0,sl=true,color = 'rgba(255, 0, 0, 255)') {
+    function line(text = "cpu", unit = "%", value_max = 100, index = 0, sl = true, color = 'rgba(255, 0, 0, 255)') {
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
@@ -64,7 +64,7 @@
         const stepX = width / 59;
         for (let i = 0; i < data.length; i++) {
             const x = padding + i * stepX;
-            const y = (height - (map(data[i][index][0],0,value_max,0,100) / 160) * height) - 20;
+            const y = (height - (map(data[i][index][0], 0, value_max, 0, 100) / 160) * height) - 20;
             if (i === 0) {
                 ctx.moveTo(x, y);
             } else {
@@ -79,9 +79,9 @@
             ctx.textAlign = 'right';
             ctx.textBaseline = 'top';
 
-            var un=`/${value_max}${unit}`
-            ctx.fillText(`${text}${sl ? un:unit}`, canvas.width - (index * 150), 10);
-            
+            var un = `/${value_max}${unit}`
+            ctx.fillText(`${text}${sl ? un : unit}`, canvas.width - (index * 150), 10);
+
         }
     }
 
@@ -92,14 +92,14 @@
         drawAxes();
 
         // วาดกราฟ
-        var label=["Vram","GPU"]
+        var label = ["Vram", "GPU"]
         // var label=["Ram","CPU"]
-        var unit=["GB","%"]
-        var la=[true,false]
-        var colors=["#eb8c34","#50c714"]
+        var unit = ["GB", "%"]
+        var la = [true, false]
+        var colors = ["#eb8c34", "#50c714"]
 
-        for(let index=0;index<newData[newData.length - 1].length;index++){
-            line(`${label[index]} ${data[data.length - 1][index][0]}`,unit[index], data[data.length - 1][index][1],index,la[index],colors[index]);
+        for (let index = 0; index < newData[newData.length - 1].length; index++) {
+            line(`${label[index]} ${data[data.length - 1][index][0]}`, unit[index], data[data.length - 1][index][1], index, la[index], colors[index]);
         }
     }
 
@@ -117,7 +117,7 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         updateChart(data);
-      
+
     }
 
     window.addEventListener('resize', resizeCanvas);

@@ -21,7 +21,7 @@
   "main": "./extension.js",
   "contributes": {
     "views": {
-      "activitybar": [
+      "explorer": [
         {
           "type": "webview",
           "id": "gpuUsageGraph",
