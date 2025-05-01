@@ -18,7 +18,8 @@ function closePopup() {
     let label_index = 0;
 
 
-    let cpu_color=['#00FFFF', '#00FF00', '#FF4500']
+    // let cpu_color=['#00FFFF', '#00FF00', '#FF4500']
+    let cpu_color=['#00FFFF', '#00FF00']
     let gpu_color=['#FFD700', '#00FF00', '#FF4500']
     let total_gpu_color=gpu_color
 
@@ -242,7 +243,8 @@ function closePopup() {
         loadSettings();
         createAndRenderDrives([]);
 
-        charts.cpuRam = createDualLineChart('cpuRamChart', labels = ['CPU Usage', 'RAM', 'CPU Temp'], colors = cpu_color);
+        // charts.cpuRam = createDualLineChart('cpuRamChart', labels = ['CPU Usage', 'RAM', 'CPU Temp'], colors = cpu_color);
+        charts.cpuRam = createDualLineChart('cpuRamChart', labels = ['CPU Usage', 'RAM'], colors = cpu_color);
         charts.gpus = createDualLineChart('showTotalGpuVramGraph', labels = ['Gpus', 'VRAMs', "Avg Temp"], colors = total_gpu_color);
         create_gpu_chart()
 

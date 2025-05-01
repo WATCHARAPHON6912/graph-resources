@@ -109,10 +109,12 @@ class GPUUsageViewProvider {
 
         <div class="menu-list">
             <div class="menu-section">
+            <!--
                 <div class="menu-item">
                     <input type="checkbox" id="showCPUTemp">
                     <label for="showCpu">Show CPU Temperature</label>
                 </div>
+            -->
                 <div class="menu-item">
                     <input type="checkbox" id="showTemp">
                     <label for="showCpu">Show GPU Temperature</label>
