@@ -1,12 +1,22 @@
 # Graph
 - Support for multiple NVIDIA GPUs
-- CPU supports both windows and ubuntu.
-![NVIDIA Monitor](images/1.png)
-![NVIDIA Monitor](images/2.png)
-![NVIDIA Monitor](images/5.png)
+- CPU supports both Windows and Ubuntu.
 
-# Storage 
-- Supports windows and ubuntu
-![NVIDIA Monitor](images/3.png)
+<p align="center">
+  <img src="images/1.png" alt="NVIDIA Monitor" />
+  <img src="images/5.png" alt="NVIDIA Monitor" />
+  <img src="images/2.png" alt="NVIDIA Monitor" />
+</p>
+
+# Storage
+- Supports Windows and Ubuntu
+
+<p align="center">
+  <img src="images/3.png" alt="NVIDIA Monitor" />
+</p>
+
 # Setting
-![NVIDIA Monitor](images/4.png)
+
+<p align="center">
+  <img src="images/4.png" alt="NVIDIA Monitor" />
+</p>
