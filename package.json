@@ -2,7 +2,7 @@
   "name": "gpu-usage-graph",
   "displayName": "Show resources",
   "description": "Show resources usage graph in the activity bar",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "publisher": "nvidia-monitor",
   "repository": {
     "type": "git",

@@ -112,7 +112,7 @@ function closePopup() {
     // ฟังก์ชันบันทึกการตั้งค่าไปยัง Local Storage
     function saveSettings() {
         settings = {
-            showCPUTemp: document.getElementById('showCPUTemp').checked,
+            // showCPUTemp: document.getElementById('showCPUTemp').checked,
             showTemp: document.getElementById('showTemp').checked,
             showCpu: document.getElementById('showCpu').checked,
             showSystemVram: document.getElementById('showSystemVram').checked,
