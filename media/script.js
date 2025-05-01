@@ -17,6 +17,11 @@ function closePopup() {
     let settings;
     let label_index = 0;
 
+
+    let cpu_color=['#00FFFF', '#00FF00', '#FF4500']
+    let gpu_color=['#FFD700', '#00FF00', '#FF4500']
+    let total_gpu_color=gpu_color
+
     function generateRandomData(min = 0, max = 100) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -106,6 +111,7 @@ function closePopup() {
     // ฟังก์ชันบันทึกการตั้งค่าไปยัง Local Storage
     function saveSettings() {
         settings = {
+            showTemp: document.getElementById('showTemp').checked,
             showCpu: document.getElementById('showCpu').checked,
             showSystemVram: document.getElementById('showSystemVram').checked,
             showGpus: document.getElementById('showGpus').checked,
@@ -235,8 +241,8 @@ function closePopup() {
         loadSettings();
         createAndRenderDrives([]);
 
-        charts.cpuRam = createDualLineChart('cpuRamChart', labels = ['CPU Usage', 'RAM'], colors = ['#4f46e5', '#ef4444']);
-        charts.gpus = createDualLineChart('showTotalGpuVramGraph', labels = ['Gpus', 'VRAMs'], colors = ['#10b981', '#f59e0b']);
+        charts.cpuRam = createDualLineChart('cpuRamChart', labels = ['CPU Usage', 'RAM', 'CPU Temp'], colors = cpu_color);
+        charts.gpus = createDualLineChart('showTotalGpuVramGraph', labels = ['Gpus', 'VRAMs', "Avg Temp"], colors = total_gpu_color);
         create_gpu_chart()
 
         // เพิ่ม event listeners สำหรับ checkboxes
@@ -334,7 +340,7 @@ function closePopup() {
             canvas.id = canvasId;
             chartDiv.appendChild(canvas);
             container.appendChild(chartDiv);
-            charts[canvasId] = createDualLineChart(canvasId, labels = ['GPU Usage', 'VRAM'], colors = ['#10b981', '#f59e0b']);
+            charts[canvasId] = createDualLineChart(canvasId, labels = ['GPU Usage', 'VRAM', "GPU Temp"], colors = gpu_color);
         }
     }
 
@@ -351,9 +357,9 @@ function closePopup() {
                 if (charts.gpus && document.getElementById('showTotalGpu').checked) {
                     updateDualChartData(charts.gpus, message.data);
                 }
-                // if (charts.gpuTotalChart && document.getElementById('showTotalGpuVramGraph').checked) {
-                //     updateDualChartData(chart.gpuTotalChart, message.data,"");
-                // }
+                if (charts.gpuTotalChart && document.getElementById('showTotalGpuVramGraph').checked) {
+                    updateDualChartData(chart.gpuTotalChart, message.data, "");
+                }
                 const container = document.getElementById("chartContainer");
                 const validCanvasIds = ["cpuRamChart", "showTotalGpuVramGraph"];
 
@@ -372,7 +378,7 @@ function closePopup() {
 
                         chartDiv.appendChild(canvas);
                         container.appendChild(chartDiv);
-                        charts[canvasId] = createDualLineChart(canvasId, labels = ['GPU Usage', 'VRAM'], colors = ['#10b981', '#f59e0b']);
+                        charts[canvasId] = createDualLineChart(canvasId, labels = ['GPU Usage', 'VRAM', "GPU Temp"], colors = ['#10b981', '#f59e0b', "#ff0000"]);
                     }
                     if (charts[canvasId] && document.getElementById('showGpuVramGraph').checked) {
                         updateDualChartData(charts[canvasId], message.data, i);
@@ -392,7 +398,7 @@ function closePopup() {
 
 
     // ฟังก์ชันอัพเดตข้อมูลกราฟที่มี 2 เส้น
-    let te = 0;
+    let le = 0;
     function updateDualChartData(chart, new_data, chart_id = "") {
         const datasets = chart.data.datasets;
         const time = document.getElementById('time').value;
@@ -408,34 +414,69 @@ function closePopup() {
             "G": settings.showGpus,
             "V": settings.showGpuVram,
             "T": settings.showTotalGpu,
+            "GPU Temp": settings.showTemp,
+            "CPU Temp": settings.showTemp,
+            "A": settings.showTemp,
+
         }
+
         const map_label = {
             "C": "CPU Usage",
             "R": "RAM",
             "G": "GPU Usage",
             "V": "VRAM",
             "T": "Total GPUs",
+            "GPU Temp": "GPU Temp",
+            "CPU Temp": "CPU Temp",
+            "A": "Avg Temp",
         }
 
         let index_label = 0;
         let num_gpu = chart_id;
         datasets.forEach(dataset => {
+            const _label_full = dataset.label.slice(0, 8)
+            const _label = dataset.label[0];
+
             index_label++;
             const data = dataset.data;
-            dataset.label = map_label[dataset.label[0]] + " " + String(index_label)
-            dataset.hidden = !map_show[dataset.label[0]];
+            dataset.label = map_label[_label] + " " + String(index_label)
+            if (_label_full === "GPU Temp" || _label_full === "CPU Temp") {
+                dataset.hidden = !map_show[_label_full];
+            }
+            else {
+                dataset.hidden = !map_show[_label];
+            }
 
             data.shift();
 
-            if (dataset.label[0] === "C") {
-                data.push(parseFloat(new_data.cpu.cpuUsage));
-                dataset.label = map_label[dataset.label[0]]
+            if (_label_full === "CPU Temp") {
+                let temp = parseFloat(new_data.cpu.temperature)
+                data.push(temp);
+                dataset.label = `CPU Temp ${temp}°C`
             }
-            else if (dataset.label[0] === "R") {
+
+            else if (_label_full === "GPU Temp") {
+                if (le>=new_data.gpu.length){
+                    le=0
+                }
+                
+                let temp = parseFloat(new_data.gpu[le].temperature)
+                le++;
+                data.push(temp);
+                dataset.label = `GPU Temp ${temp}°C`
+            }
+
+            else if (_label === "C") {
+                data.push(parseFloat(new_data.cpu.cpuUsage));
+                dataset.label = map_label[_label]
+            }
+            else if (_label === "R") {
                 data.push((parseFloat(new_data.cpu.memoryUsage) / parseFloat(new_data.cpu.memoryTotal)) * 100);
                 dataset.label = `RAM ${new_data.cpu.memoryUsage}/${new_data.cpu.memoryTotal}GB`
             }
-            else if (dataset.label[0] === "G" && num_gpu === "") {
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+            else if (_label === "G" && num_gpu === "") {
                 let total = 0
                 for (var x = 0; x < new_data.gpu.length; x++) {
                     total += parseFloat(new_data.gpu[x].gpuUsage)
@@ -444,7 +485,7 @@ function closePopup() {
                 dataset.label = `GPU: ${new_data.gpu.length}GPU`
                 data.push((total / new_data.gpu.length).toFixed(2));
             }
-            else if (dataset.label[0] === "V" && num_gpu === "") {
+            else if (_label === "V" && num_gpu === "") {
                 let total = 0
                 let used = 0
                 for (var x = 0; x < new_data.gpu.length; x++) {
@@ -454,14 +495,28 @@ function closePopup() {
                 dataset.label = `Vram ${used}/${total}GB`
                 data.push((used / total) * 100);
             }
-            else if (dataset.label[0] === "G") {
+            else if (_label === "A" && num_gpu === "") {
+
+                let da = []
+                for (var x = 0; x < new_data.gpu.length; x++) {
+                    da.push(parseFloat(new_data.gpu[x].temperature))
+                }
+                const average = da.reduce((sum, value) => sum + value, 0) / da.length;
+
+                dataset.label = `Avg Temp ${average}°C`
+                data.push(average);
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+
+            else if (_label === "G") {
                 data.push(parseFloat(new_data.gpu[num_gpu].gpuUsage));
                 dataset.label = `GPU${num_gpu}: ${new_data.gpu[num_gpu].device}`
             }
-            else if (dataset.label[0] === "V") {
+            else if (_label === "V") {
                 data.push((parseFloat(new_data.gpu[num_gpu].memoryUsage) / parseFloat(new_data.gpu[num_gpu].memoryTotal)) * 100);
                 dataset.label = `VRAM ${new_data.gpu[num_gpu].memoryUsage}/${new_data.gpu[num_gpu].memoryTotal}GB`
             }
+
             else {
 
             }
@@ -473,7 +528,7 @@ function closePopup() {
             const va = []
             for (j = 0; j < labels.length; j++) {
                 if (labels[j] == "") {
-                    va.push("g")
+                    va.push(" ")
                 }
             }
             const timeString = String(parseInt(time, 10) - va.length + 1) + "s"

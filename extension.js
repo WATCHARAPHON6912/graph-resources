@@ -110,6 +110,10 @@ class GPUUsageViewProvider {
         <div class="menu-list">
             <div class="menu-section">
                 <div class="menu-item">
+                    <input type="checkbox" id="showTemp">
+                    <label for="showCpu">Show Temperature</label>
+                </div>
+                <div class="menu-item">
                     <input type="checkbox" id="showCpu">
                     <label for="showCpu">Show CPU usage</label>
                 </div>
@@ -296,9 +300,6 @@ class GPUUsageViewProvider {
         });
 
         // console.log(this.currentData)
-
-
-
         // this.currentData.gpu[0].device="test gpu"
         // this.currentData.gpu[0].memoryTotal="10"
         // this.currentData.gpu[0].memoryUsage="5"
@@ -310,6 +311,9 @@ class GPUUsageViewProvider {
         //     use_Size: `${50}`
 
         // })
+
+        // this.currentData.gpu[0].temperature="20"
+        // this.currentData.gpu[1].temperature="10"
 
         return this.currentData;
     }
