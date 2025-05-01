@@ -111,6 +111,7 @@ function closePopup() {
     // ฟังก์ชันบันทึกการตั้งค่าไปยัง Local Storage
     function saveSettings() {
         settings = {
+            showCPUTemp: document.getElementById('showCPUTemp').checked,
             showTemp: document.getElementById('showTemp').checked,
             showCpu: document.getElementById('showCpu').checked,
             showSystemVram: document.getElementById('showSystemVram').checked,
@@ -415,7 +416,7 @@ function closePopup() {
             "V": settings.showGpuVram,
             "T": settings.showTotalGpu,
             "GPU Temp": settings.showTemp,
-            "CPU Temp": settings.showTemp,
+            "CPU Temp": settings.showCPUTemp,
             "A": settings.showTemp,
 
         }
