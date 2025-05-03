@@ -142,7 +142,7 @@ class GPUUsageViewProvider {
                 <div class="menu-item">
                     <input type="checkbox" id="showGpuVramGraph">
                     <label for="showGpuVramGraph">Shows
-                        <input type="number" id="gpuNValue" min=1 max=10000 value="1">
+                        <input type="number" id="gpuNValue" min=0 max=10000 value=0>
                         graphs of GPUs and VRAMs.
                     </label>
                 </div>

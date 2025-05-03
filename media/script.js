@@ -134,6 +134,9 @@ function closePopup() {
     // ฟังก์ชันโหลดการตั้งค่าจาก Local Storage
     function loadSettings() {
         const savedSettings = localStorage.getItem('systemMonitorSettings');
+        if (savedSettings === null){
+            saveSettings()
+        }
         if (savedSettings) {
             settings = JSON.parse(savedSettings);
             Object.keys(settings).forEach(key => {
