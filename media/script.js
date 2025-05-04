@@ -427,7 +427,7 @@ function closePopup() {
         }
 
         const map_label = {
-            "C": "CPU Usage",
+            "C": "CPU: ",
             "R": "RAM",
             "G": "GPU Usage",
             "V": "VRAM",
@@ -474,7 +474,7 @@ function closePopup() {
 
             else if (_label === "C") {
                 data.push(parseFloat(new_data.cpu.cpuUsage));
-                dataset.label = map_label[_label]
+                dataset.label = map_label[_label]+" "+new_data.cpu.cpuName
             }
             else if (_label === "R") {
                 data.push((parseFloat(new_data.cpu.memoryUsage) / parseFloat(new_data.cpu.memoryTotal)) * 100);

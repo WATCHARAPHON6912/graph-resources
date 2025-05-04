@@ -30,6 +30,7 @@ class GPUUsageViewProvider {
                 }
             ],
             cpu: {
+                cpuName: 'N/A',
                 cpuUsage: '0',
                 memoryUsage: '0',
                 memoryTotal: '0',
@@ -179,21 +180,21 @@ class GPUUsageViewProvider {
     _getGPUUsage() {
         const platform = process.platform;
         let nvidiaCommand, cpuCommand, ramCommand, driveCommand, netCommand;
-        if (platform === 'win32') {
-            // nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
+        // nvidiaCommand = "nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits && \
             // nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits"
-            nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
-            cpuCommand = 'wmic cpu get loadpercentage /value';
-            ramCommand = 'wmic OS get FreePhysicalMemory,TotalVisibleMemorySize /value';
-            driveCommand = "wmic logicaldisk get Caption, Size, FreeSpace /format:csv";
-            netCommand = "netstat -e"
-        } else if (platform === 'linux') {
-            nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
-            cpuCommand = "top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'";
-            ramCommand = "LC_ALL=C free -m | awk '/Mem:/ {printf \"%d\\n%d\", $3, $2}'";
-            driveCommand = "df -B1 | awk 'NR==1 {print \"Filesystem,Size,Used,Available,Use%,Mounted_on\"} NR>1 {print $1\",\"$2\",\"$3\",\"$4\",\"$5\",\"$6}'";
+        nvidiaCommand = 'nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu --format=csv,noheader,nounits';
+        
+        if (platform === 'win32') {
+            cpuCommand = `powershell -Command "$cpu=Get-CimInstance Win32_Processor; $os=Get-CimInstance Win32_OperatingSystem; $drives=Get-CimInstance Win32_LogicalDisk; $usedMem=[int]$os.TotalVisibleMemorySize - [int]$os.FreePhysicalMemory; Write-Output \\"cpu,$($cpu.Name) ,$($cpu.LoadPercentage)\\"; Write-Output \\"ram,$usedMem ,$($os.TotalVisibleMemorySize)\\"; $drives | ForEach-Object { Write-Output \\"drive,$($_.DeviceID) ,$($_.FreeSpace) ,$($_.Size)\\" }"`;
 
-            netCommand = "netstat -e"
+        } else if (platform === 'linux') {
+            cpuCommand = `
+echo -n "cpu,"; lscpu | awk -F: '/Model name/ {gsub(/^ +| +$/, "", $2); printf "%s ,", $2}'; 
+top -bn1 | grep "Cpu(s)" | awk '{print int($2)}'; 
+echo -n "ram,"; free -k | awk '/Mem:/ {used=$2-$7; printf "%d ,%d\\n", used, $2}'; 
+df -k --output=target,used,size | tail -n +2 | awk '{printf "drive,%s ,%d ,%d\\n", $1, $2*1024, $3*1024}'
+`;
+            // netCommand = "netstat -e"
         } else {
             console.error('Unsupported OS');
             return;
@@ -222,88 +223,47 @@ class GPUUsageViewProvider {
 
         });
 
-
         exec(cpuCommand, (error, stdout, stderr) => {
-            if (platform === 'win32') {
-                if (error) {
-                    // console.error(`Error executing CPU command: ${stderr}`);
-                } else {
-                    this.currentData.cpu.cpuUsage = `${stdout.trim().split('=')[1]}`;
-                }
-            }
-            else {
-                this.currentData.cpu.cpuUsage = stdout.trim();
-            }
-
-            exec(ramCommand, (error, stdout, stderr) => {
-                if (platform === 'win32') {
-                    if (error) {
-                        // console.error(`Error executing RAM command: ${stderr}`);
-                    } else {
-                        var x = stdout.trim().split('\n');
-                        var free = x[0].split('=')[1];
-                        var total = x[1].split('=')[1]
-                        this.currentData.cpu.memoryUsage = `${((total - free) / (1024 * 1024)).toFixed(2)}`;
-                        this.currentData.cpu.memoryTotal = `${(total / (1024 * 1024)).toFixed(2)}`;
-                    }
-                } else {
-                    if (error) {
-                        // console.error(`Error executing RAM command: ${stderr}`);
-                        this.currentData.ramUsage = 'Error';
-                    } else {
-                        var x = stdout.trim().split('\n');
-                        var total = x[1];
-                        var used = x[0];
-                        this.currentData.cpu.memoryUsage = `${(used / (1024)).toFixed(2)}`;
-                        this.currentData.cpu.memoryTotal = `${(total / (1024)).toFixed(2)}`;
-                    }
-                }
-            });
-        });
-
-
-        exec(driveCommand, (error, stdout, stderr) => {
 
             if (error) {
-                console.error(`Error executing driveCommand: ${stderr}`);
-
+                // console.error(`Error executing CPU command: ${stderr}`);
             } else {
-                if (platform === 'win32') {
-                    const lines = stdout.trim().split('\n');
-                    if (lines.length > 0) {
-                        this.currentData.drive = []
-                        for (let i = 1; i < lines.length; i++) {
-                            const [Node, Caption, FreeSpace, Size] = lines[i].replace("\r", "").split(',')
-                            this.currentData.drive.push({
-                                drive_name: Caption,
-                                total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
-                                use_Size: `${((Size - FreeSpace) / (1024 * 1024 * 1024)).toFixed(2)}`
+                const lines = stdout.trim().split('\n');
+                console.log(stdout.trim())
 
-                            })
-                        }
+                this.currentData.drive = []
+
+                for (let i = 0; i < lines.length; i++) {
+
+                    switch (i) {
+                        case 0:
+                            const [id_cpu, cpu_name, cpu_usage] = lines[i].replaceAll("\r", "").split(',');
+                            if (id_cpu === "cpu") {
+                                this.currentData.cpu.cpuName = cpu_name
+                                this.currentData.cpu.cpuUsage = cpu_usage
+                            }
+
+                        case 1:
+                            const [id_ram, ram_used, ram_total] = lines[i].replaceAll("\r", "").split(',');
+                            if (id_ram === "ram") {
+                                this.currentData.cpu.memoryUsage = `${(ram_used / (1024 * 1024)).toFixed(2)}`
+                                this.currentData.cpu.memoryTotal = `${(ram_total / (1024 * 1024)).toFixed(2)}`
+                            }
+
+                        default:
+                            const [id_drive, drive_name, drive_used, drive_total] = lines[i].replaceAll("\r", "").split(',');
+                            if (id_drive === "drive") {
+                                this.currentData.drive.push({
+                                    drive_name: drive_name,
+                                    total_Size: `${(drive_total / (1024 * 1024 * 1024)).toFixed(2)}`,
+                                    use_Size: `${(drive_used / (1024 * 1024 * 1024)).toFixed(2)}`,
+                                })
+                            }
                     }
                 }
-                else {
-                    const lines = stdout.trim().split('\n');
-                    if (lines.length > 0) {
-                        this.currentData.drive = []
-                        for (let i = 1; i < lines.length; i++) {
-                            const [Filesystem, Size, Used, Available, Use_percen, Mounted_on] = lines[i].replace("\r", "").split(',')
-                            this.currentData.drive.push({
-                                drive_name: Mounted_on,
-                                total_Size: `${((Size) / (1024 * 1024 * 1024)).toFixed(2)}`,
-                                use_Size: `${((Used) / (1024 * 1024 * 1024)).toFixed(2)}`
-
-                            })
-                        }
-                    }
-                }
-
-
             }
-
-
         });
+
 
         // console.log(this.currentData)
         // this.currentData.gpu[0].device="test gpu"
@@ -320,6 +280,7 @@ class GPUUsageViewProvider {
 
         // this.currentData.gpu[0].temperature="20"
         // this.currentData.gpu[1].temperature="10"
+        // console.log(this.currentData.drive)
 
         return this.currentData;
     }
